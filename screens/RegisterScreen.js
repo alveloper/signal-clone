@@ -31,11 +31,11 @@ const RegisterScreen = ({ navigation }) => {
     auth.createUserWithEmailAndPassword(email, password)
     .then((authUser) => {
       // (6-2) 프로필 업데이트
-      authUser.user.update({
+      authUser.user.updateProfile({
         displayName: name, // (6-4) displayName은 firebase의 property임
         photoURL: // (6-4) imageUrl을 pass하거나 없으면 아래 url 이미지를 넘김
           imageUrl ||
-          "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
+          "http://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png",
       });
     }).catch(error => alert(error.message)); // (6-3) 에러 발생 시 alert 
   };

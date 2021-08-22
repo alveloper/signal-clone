@@ -14,6 +14,7 @@ const LoginScreen = ({ navigation }) => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       // 로그인이 안 됐으면 authUser는 비어있을 것임
       // 로그인이 됐다면 Home 컴포넌트로 간다
+      console.log(authUser); // 디버깅용
       if (authUser) {
         navigation.replace("Home");
       }
@@ -21,7 +22,12 @@ const LoginScreen = ({ navigation }) => {
     return unsubscribe;
   }, []);
 
-  const signIn = () => {};
+  // email, password 를 받아 signIn
+  const signIn = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error));
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -46,6 +52,7 @@ const LoginScreen = ({ navigation }) => {
           type="Password"
           value={password}
           onChangeText={(text) => setPassword(text)}
+          onSubmitEditing={signIn} // 추가
         />
       </View>
 
