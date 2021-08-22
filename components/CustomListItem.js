@@ -2,9 +2,10 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
 
+// HomeScreen 에서 채팅방 목록까지 표시 후 다시 CustomListItem.js 로 돌아오기
 const CustomListItem = ({ id, chatName, enterChat }) => {
   return (
-    <ListItem>
+    <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
       <Avatar
         rounded
         source={{
@@ -12,10 +13,10 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
         }}
       />
       <ListItem.Content>
+        {/* youtubechat -> 채팅방 이름이 보이도록 */}
         <ListItem.Title style={{ fontWeight: "bold" }}>
-          Youtube Chat
+          {chatName}
         </ListItem.Title>
-        {/* numberOfLines={1} 때문에 여러줄 입력해도 한 줄만 보임 */}
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
           This is a test subtitle.
           This is a test subtitle.

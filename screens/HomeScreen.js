@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,16 +14,28 @@ import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 
 const HomeScreen = ({ navigation }) => {
-  // (3) signOutUser 함수 생성
+  // (2) AddChatScreen.js 수정 후, 채팅창 목록 state로 관리하기
+  const [chats, setChats] = useState([]);
+
   const signOutUser = () => {
-    // auth 의 signOut 메서드는 promise 객체를 반환
-    // Login 페이지로 이동
     auth.signOut().then(() => {
       navigation.replace("Login");
     });
   };
 
-  // (2) useLayoutEffect 설정
+  // (3) useEffect 채팅방 목록 더하기
+  useEffect(() => {
+    const unsubscribe = db.collection("chats").onSnapshot((snapshot) => {
+      setChats(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+    return unsubscribe;
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: "Signal",
@@ -31,15 +43,12 @@ const HomeScreen = ({ navigation }) => {
       headerTitleStyle: { color: "black" },
       headerTintColor: "black",
       headerLeft: () => (
-        // 헤더 왼쪽에 유저가 회원가입 시 입력한 이미지(또는 우리가 기본으로 지정한 이미지)
         <View style={{ marginLeft: 20 }}>
-          {/* (3) onPress 에 signOutUser -> 프로필 이미지 누르면 로그아웃 되도록 하기 */}
           <TouchableOpacity onPress={signOutUser} activeOpacity={0.5}>
             <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
           </TouchableOpacity>
         </View>
       ),
-      // (4) 헤더 오른쪽에 카메라, 채팅창 버튼 만들기
       headerRight: () => (
         <View
           style={{
@@ -52,20 +61,25 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity activeOpacity={0.5}>
             <EvilIcons name="camera" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity activeOpacity={0.5}>
+          {/* (1) 버튼 눌렀을 때 채팅창 컴포넌트로 연결 */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AddChat")}
+            activeOpacity={0.5}
+          >
             <EvilIcons name="pencil" size={24} color="black" />
           </TouchableOpacity>
         </View>
       ),
     });
-    // dependencies 에 navigation 넣어주기
   }, [navigation]);
 
   return (
-    // (1) View -> SafeAreaView 로 바꾸기 (for iOS)
     <SafeAreaView>
-      <ScrollView>
-        <CustomListItem />
+      <ScrollView style={styles.container}>
+        {/* (3) 채팅 목록 표시하기 */}
+        {chats.map(({ id, data: { chatName } }) => (
+          <CustomListItem key={id} id={id} chatName={chatName} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -73,4 +87,8 @@ const HomeScreen = ({ navigation }) => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    height: '100%', // ScrollView 높이에 맞게
+  },
+});
