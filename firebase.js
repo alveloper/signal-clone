@@ -1,6 +1,6 @@
 // (1) 임포트하기
 // import * as firebase from "firebase" 하고도 필요한 건 직접 임포트 해야 함
-import * as firebase from "firebase";
+import firebase from 'firebase';
 import "firebase/firestore";
 import "firebase/auth";
 

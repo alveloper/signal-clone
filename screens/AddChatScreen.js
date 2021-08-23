@@ -44,7 +44,7 @@ const AddChatScreen = ({ navigation }) => {
         }
       />
       {/* (3) 새로운 채팅창 만들기 버튼 */}
-      <Button onPress={createChat} title="Create new chat" />
+      <Button disabled={!input} onPress={createChat} title="Create new chat" />
     </View>
   );
 };

@@ -14,7 +14,6 @@ import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 
 const HomeScreen = ({ navigation }) => {
-  // (2) AddChatScreen.js 수정 후, 채팅창 목록 state로 관리하기
   const [chats, setChats] = useState([]);
 
   const signOutUser = () => {
@@ -23,7 +22,6 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  // (3) useEffect 채팅방 목록 더하기
   useEffect(() => {
     const unsubscribe = db.collection("chats").onSnapshot((snapshot) => {
       setChats(
@@ -61,7 +59,6 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity activeOpacity={0.5}>
             <EvilIcons name="camera" size={24} color="black" />
           </TouchableOpacity>
-          {/* (1) 버튼 눌렀을 때 채팅창 컴포넌트로 연결 */}
           <TouchableOpacity
             onPress={() => navigation.navigate("AddChat")}
             activeOpacity={0.5}
@@ -73,12 +70,24 @@ const HomeScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
+  // CustomListItem 에 전달할 enterChat 함수 생성
+  const enterChat = (id, chatName) => {
+    navigation.navigate("Chat", {
+      id: id,
+      chatName: chatName,
+    });
+  };
+
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
-        {/* (3) 채팅 목록 표시하기 */}
         {chats.map(({ id, data: { chatName } }) => (
-          <CustomListItem key={id} id={id} chatName={chatName} />
+          <CustomListItem
+            key={id}
+            id={id}
+            chatName={chatName}
+            enterChat={enterChat}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -89,6 +98,6 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%', // ScrollView 높이에 맞게
+    height: '100%', 
   },
 });

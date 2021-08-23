@@ -1,26 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
+import { db } from "../firebase";
 
-// HomeScreen 에서 채팅방 목록까지 표시 후 다시 CustomListItem.js 로 돌아오기
 const CustomListItem = ({ id, chatName, enterChat }) => {
+  // ChatScreen.js 에서 (11) 까지 하고 난 뒤, useState & useEffect
+  const [chatMessages, setChatMessages] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = db
+      .collection("chats")
+      .doc(id)
+      .collection("messages")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) =>
+        setChatMessages(snapshot.docs.map((doc) => doc.data()))
+      );
+
+      return unsubscribe;
+  }, []);
+
   return (
-    <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
+    <ListItem
+      key={id} // key={id} 추가
+      onPress={() => enterChat(id, chatName)}
+      key={id}
+      bottomDivider
+    >
       <Avatar
         rounded
         source={{
-          uri: "http://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png",
+          uri:
+            chatMessages?.[0]?.photoURL ||
+            "http://connectingcouples.us/wp-content/uploads/2019/07/avatar-placeholder.png",
         }}
       />
       <ListItem.Content>
-        {/* youtubechat -> 채팅방 이름이 보이도록 */}
         <ListItem.Title style={{ fontWeight: "bold" }}>
           {chatName}
         </ListItem.Title>
-        <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          This is a test subtitle.
-          This is a test subtitle.
-          This is a test subtitle.
+        <ListItem.Subtitle
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {chatMessages?.[0]?.displayName}: {chatMessages?.[0]?.message}
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
